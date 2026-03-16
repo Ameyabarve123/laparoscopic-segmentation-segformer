@@ -1,29 +1,63 @@
+# -----------------------------
 # Python
+# -----------------------------
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
 *.so
+*.egg
+*.egg-info/
+build/
+dist/
 
+# -----------------------------
 # Virtual environments
+# -----------------------------
 .venv/
-env/
 venv/
+env/
 
-# OS
+# -----------------------------
+# IDE / Editors
+# -----------------------------
+.vscode/
+.idea/
+*.iml
+
+# -----------------------------
+# OS files
+# -----------------------------
 .DS_Store
+Thumbs.db
 
-# Data (do NOT upload dataset)
-data/raw/
-data/processed/
-
-# Training artifacts
+# -----------------------------
+# Machine learning artifacts
+# -----------------------------
 checkpoints/
 outputs/
 logs/
+runs/
 
-# Huggingface cache
+# -----------------------------
+# Dataset folders
+# -----------------------------
+data/raw/
+data/processed/
+
+# -----------------------------
+# HuggingFace cache
+# -----------------------------
 .cache/
+huggingface/
 
-# VSCode
-.vscode/
+# -----------------------------
+# Jupyter
+# -----------------------------
+.ipynb_checkpoints/
+
+# -----------------------------
+# Temporary files
+# -----------------------------
+*.tmp
+*.log
