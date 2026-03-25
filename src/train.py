@@ -141,7 +141,7 @@ def train_one_epoch(model, dataloader, optimizer, device):
 def main():
     set_seed()
 
-    device = torch.device("cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Using device:", device)
     pin_memory = False
 
