@@ -14,8 +14,8 @@ from model_utils import build_segformer
 from transforms import get_train_transform, get_val_transform
 
 import os
-from pathlib import Path
 
+# ===== Paths =====
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_ROOT = Path(os.environ.get("DATA_ROOT", PROJECT_ROOT / "data" / "processed" / "CholecSeg8k"))
 
@@ -29,7 +29,7 @@ VAL_SPLIT = SPLITS_DIR / "val.txt"
 CHECKPOINT_DIR = PROJECT_ROOT / "checkpoints"
 CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
-
+# ===== Hyperparameters =====
 SEED = 42
 IMAGE_SIZE = (384, 384)
 BATCH_SIZE = 2
@@ -38,13 +38,13 @@ LEARNING_RATE = 1e-4
 WEIGHT_DECAY = 1e-4
 NUM_WORKERS = 0
 
-# Set this to True for debugging
 OVERFIT_TINY_BATCH = False
 OVERFIT_SAMPLES = 16
 
 IGNORE_INDEX = 255
 
 
+# ===== Utilities =====
 def set_seed(seed: int = SEED) -> None:
     random.seed(seed)
     np.random.seed(seed)
@@ -53,22 +53,15 @@ def set_seed(seed: int = SEED) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-video_list = [1, 26, 27, 12, 17, 24]  # keep this list at the top of your file
-
 def make_dataloaders(pin_memory: bool):
-    # Convert video numbers to zero-padded string prefixes
-    video_prefixes = [f"video{v:02d}_" for v in video_list]
-
-    # Helper function to filter filenames by prefix
-    def filter_files(files):
-        return [f for f in files if any(f.startswith(pref) for pref in video_prefixes)]
-
+    """
+    Create PyTorch dataloaders using the pre-filtered split files.
+    """
     train_dataset = CholecSeg8kDataset(
         images_dir=IMAGES_DIR,
         masks_dir=MASKS_DIR,
         split_file=TRAIN_SPLIT,
         transform=get_train_transform(IMAGE_SIZE),
-        file_filter=filter_files,  # <-- assuming your dataset supports a filter function
     )
 
     val_dataset = CholecSeg8kDataset(
@@ -76,7 +69,6 @@ def make_dataloaders(pin_memory: bool):
         masks_dir=MASKS_DIR,
         split_file=VAL_SPLIT,
         transform=get_val_transform(IMAGE_SIZE),
-        file_filter=filter_files,  # <-- same here
     )
 
     if OVERFIT_TINY_BATCH:
@@ -106,6 +98,7 @@ def make_dataloaders(pin_memory: bool):
     return train_loader, val_loader
 
 
+# ===== Training =====
 def train_one_epoch(model, dataloader, optimizer, device):
     model.train()
 
@@ -144,6 +137,7 @@ def train_one_epoch(model, dataloader, optimizer, device):
     return total_loss / max(total_batches, 1)
 
 
+# ===== Main =====
 def main():
     set_seed()
 
