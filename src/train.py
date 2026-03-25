@@ -53,12 +53,22 @@ def set_seed(seed: int = SEED) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+video_list = [1, 26, 27, 12, 17, 24]  # keep this list at the top of your file
+
 def make_dataloaders(pin_memory: bool):
+    # Convert video numbers to zero-padded string prefixes
+    video_prefixes = [f"video{v:02d}_" for v in video_list]
+
+    # Helper function to filter filenames by prefix
+    def filter_files(files):
+        return [f for f in files if any(f.startswith(pref) for pref in video_prefixes)]
+
     train_dataset = CholecSeg8kDataset(
         images_dir=IMAGES_DIR,
         masks_dir=MASKS_DIR,
         split_file=TRAIN_SPLIT,
         transform=get_train_transform(IMAGE_SIZE),
+        file_filter=filter_files,  # <-- assuming your dataset supports a filter function
     )
 
     val_dataset = CholecSeg8kDataset(
@@ -66,6 +76,7 @@ def make_dataloaders(pin_memory: bool):
         masks_dir=MASKS_DIR,
         split_file=VAL_SPLIT,
         transform=get_val_transform(IMAGE_SIZE),
+        file_filter=filter_files,  # <-- same here
     )
 
     if OVERFIT_TINY_BATCH:
